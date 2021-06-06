@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MatchParentLayout"
+    tools:context="com.tushar.map.ui.dashboard.DashboardActivity">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/dashboardNavHostContainer"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="@dimen/dimen_0"
+        android:layout_height="@dimen/dimen_0"
+        android:background="@color/white"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/dashboard_nav_graph" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav_menu"
+        android:layout_width="@dimen/dimen_0"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:elevation="@dimen/dimen_6"
+        app:itemIconTint="@drawable/bottom_navigation_menu"
+        app:itemTextColor="@drawable/bottom_navigation_menu"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_navigation_menu" />
+</androidx.constraintlayout.widget.ConstraintLayout>

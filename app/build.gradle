@@ -1,0 +1,118 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+    id 'androidx.navigation.safeargs.kotlin'
+    //secure the api key
+    id 'com.google.secrets_gradle_plugin' version '0.5'
+}
+
+android {
+    compileSdkVersion rootProject.ext.compile_sdk_version
+    buildToolsVersion "30.0.3"
+
+    defaultConfig {
+        applicationId "com.tushar.map"
+        minSdkVersion rootProject.ext.min_sdk_version
+        targetSdkVersion rootProject.ext.target_sdk_version
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        // Add this debug config to provide debug settings
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://blooming-stream-45371.herokuapp.com/\"")
+        }
+        release {
+            minifyEnabled true // to apply the proguard
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BASE_URL", "\"https://api.projects.bootcamp.mindorks.com/batch/green/\"")
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "androidx.core:core-ktx:$core_ktx_version"
+    implementation "com.google.android.material:material:$material_version"
+    testImplementation "junit:junit:$junit_version"
+    androidTestImplementation "androidx.test.ext:junit:$test_ext_runner_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+
+    // Android Support Library
+    implementation "androidx.appcompat:appcompat:$app_compat_version"
+
+    // Constraint Layout
+    implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
+
+    // Dagger
+    implementation "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+
+    // Dependency injection - Hilt
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hilt_view_model_version"
+    kapt "androidx.hilt:hilt-compiler:$hilt_view_model_version"
+
+    // ViewModel and LiveData
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+
+    // Navigation component
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    // Networking
+    // Networking
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+
+    // Data store
+    implementation "androidx.datastore:datastore-preferences:$data_store_version"
+
+    // Reactive
+    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxjava_version"
+    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroid_version"
+
+    // Parser
+    implementation "com.google.code.gson:gson:$gson_version"
+
+    //map
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+    implementation 'com.google.maps.android:maps-ktx:3.0.1'
+    implementation 'com.google.android.libraries.maps:maps:3.1.0-beta'
+    implementation 'com.google.android.libraries.places:places:2.4.0'
+
+    //cardview
+    implementation "androidx.cardview:cardview:$card_view"
+
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+}
+
+secrets {
+    // To add your Maps API key to this project:
+    // 1. Open the root project's local.properties file
+    // 2. Add this line, where YOUR_API_KEY is your API key:
+    //        MAPS_API_KEY=YOUR_API_KEY
+    defaultPropertiesFileName 'local.properties'
+}
