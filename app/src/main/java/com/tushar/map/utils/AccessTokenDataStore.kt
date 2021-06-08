@@ -8,6 +8,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.createDataStore
 import com.tushar.map.ui.dashboard.model.AccessToken
+import com.tushar.map.ui.dashboard.model.DisplayName
+import com.tushar.map.ui.dashboard.model.EmailId
 import com.tushar.map.ui.dashboard.model.UserData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +22,7 @@ class AccessTokenDataStore @Inject constructor(@ApplicationContext context: Cont
         val USER_LOGGED_IN = booleanPreferencesKey("user_looged_in")
         val USER_TOKEN = stringPreferencesKey("access_token")
         val DISPLAY_NAME = stringPreferencesKey("display_name")
+        val EMAIL = stringPreferencesKey("email")
     }
 
     private val dataStore: DataStore<Preferences> = context.createDataStore(name = "user")
@@ -36,6 +39,19 @@ class AccessTokenDataStore @Inject constructor(@ApplicationContext context: Cont
             UserData(loggedIn)
     }
 
+
+    val displayNameFlow: Flow<DisplayName> = dataStore.data
+        .map { preferences ->
+            val displayName = preferences[DISPLAY_NAME] ?: ""
+            DisplayName(displayName)
+        }
+
+    val emailIdFlow: Flow<EmailId> = dataStore.data
+        .map { preferences ->
+            val emailId = preferences[EMAIL] ?: ""
+            EmailId(emailId)
+    }
+
     suspend fun updateUserLoggedInStatus(loggedIn: Boolean) {
         dataStore.edit { preferences ->
             preferences[USER_LOGGED_IN] = loggedIn
@@ -47,7 +63,6 @@ class AccessTokenDataStore @Inject constructor(@ApplicationContext context: Cont
             token?.let {
                 preferences[USER_TOKEN] = it
             }
-
         }
     }
 
@@ -57,6 +72,14 @@ class AccessTokenDataStore @Inject constructor(@ApplicationContext context: Cont
                 preferences[DISPLAY_NAME] = it
             }
 
+        }
+    }
+
+    suspend fun saveEmail(email: String?) {
+        dataStore.edit { preferences ->
+            email?.let {
+                preferences[EMAIL] = it
+            }
         }
     }
 }

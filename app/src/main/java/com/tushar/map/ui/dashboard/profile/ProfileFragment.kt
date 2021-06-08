@@ -2,6 +2,7 @@ package com.tushar.map.ui.dashboard.profile
 
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.tushar.map.databinding.FragmentProfileBinding
 import com.tushar.map.ui.base.BaseFragment
 import com.tushar.map.ui.dashboard.viewmodel.DashboardViewModel
@@ -15,8 +16,13 @@ class ProfileFragment: BaseFragment<DashboardViewModel, FragmentProfileBinding>(
 
     override fun setupView(view: View) {
         fragmentBinding.run {
-            tvUserName.text = viewModel.userInfo.value?.data?.displayName
-            tvUserEmail.text = viewModel.userInfo.value?.data?.email
+            viewModel.retrieveData()
+            viewModel.displayName.observe(viewLifecycleOwner, Observer {displayName ->
+                tvUserName.text = displayName
+            })
+            viewModel.emailId.observe(viewLifecycleOwner, Observer {emailId ->
+                tvUserEmail.text = emailId
+            })
             btLogout.setOnClickListener { viewModel.logout() }
         }
     }

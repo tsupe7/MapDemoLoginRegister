@@ -16,11 +16,18 @@ class UserRepositoryImpl  @Inject constructor(
     lateinit var resource : UserInfoResponse
     override fun userLoggedInData() = dataStore.userLoggedInFlow
     override fun tokenData() = dataStore.tokenFlow
+    override fun displayName() = dataStore.displayNameFlow
+    override fun emailId() = dataStore.emailIdFlow
 
     override suspend fun getUser(): UserInfoResponse {
 
         tokenData().collect {
             resource = service.getUser(it.token)
+
+            if(resource.displayName!=null){
+                dataStore.saveDisplayName(resource.displayName)
+                dataStore.saveEmail(resource.email)
+            }
         }
         return resource
     }
@@ -32,6 +39,7 @@ class UserRepositoryImpl  @Inject constructor(
         with(dataStore) {
             updateToken("")
             saveDisplayName("")
+            saveEmail("")
             updateUserLoggedInStatus(loggedIn = false)
         }
     }

@@ -1,5 +1,6 @@
 package com.tushar.map.ui.dashboard.viewmodel
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tushar.login.repository.LoginRepository
 import com.tushar.map.ui.base.BaseViewModel
@@ -10,26 +11,24 @@ import com.tushar.map.ui.login.model.response.LoginUserResponse
 import com.tushar.map.utils.Result
 import com.tushar.map.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(private val repository: UserRepository) : BaseViewModel() {
 
-    private val _userInfo = SingleLiveEvent<Result<UserInfoResponse>>()
-    val userInfo: SingleLiveEvent<Result<UserInfoResponse>> = _userInfo
-    init {
-        getUser()
-    }
+    var displayName = MutableLiveData<String>()
+    var emailId = MutableLiveData<String>()
 
-    fun getUser(){
+    fun retrieveData() {
         viewModelScope.launch {
-            userInfo.postValue(Result.loading(null))
-            try {
-                val response = repository.getUser()
-                userInfo.postValue(Result.success(response))
-            } catch (e: Exception) {
-                userInfo.postValue(Result.error(e.toString(), null))
+            repository.displayName().collect{
+              displayName.postValue( it.displayName)
+            }
+
+            repository.emailId().collect{
+                emailId.postValue(it.emailId)
             }
         }
     }

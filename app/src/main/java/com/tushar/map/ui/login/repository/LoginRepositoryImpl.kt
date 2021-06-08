@@ -18,7 +18,6 @@ class LoginRepositoryImpl @Inject constructor(
         if (resource.authenticationToken!=null) {
             dataStore.updateUserLoggedInStatus(true)
             dataStore.updateToken(resource.authenticationToken)
-            dataStore.saveDisplayName(resource.person.displayName)
         }
         return resource
     }
