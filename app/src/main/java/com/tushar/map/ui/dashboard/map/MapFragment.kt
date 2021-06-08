@@ -28,6 +28,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.tushar.map.BuildConfig
 import com.tushar.map.R
 import com.tushar.map.databinding.FragmentMapBinding
 import com.tushar.map.ui.base.BaseFragment
@@ -65,7 +66,7 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
 
         placesClient = activity?.let {
 
-            Places.initialize(it, getString(R.string.maps_api_key))
+            Places.initialize(it, BuildConfig.MAPS_API_KEY)
             Places.createClient(it)
         }!!
 
@@ -117,12 +118,6 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
 
         // Prompt the user for permission.
         getLocationPermission();
-
-        // Turn on the My Location layer and the related control on the map.
-        updateLocationUI();
-
-        // Get the current location of the device and set the position of the map.
-        getDeviceLocation();
     }
 
     private fun getLocationPermission() {
@@ -138,12 +133,15 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
             }
             == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true
+            // Turn on the My Location layer and the related control on the map.
+            updateLocationUI();
+
+            // Get the current location of the device and set the position of the map.
+            getDeviceLocation()
         } else {
-            activity?.let {
-                ActivityCompat.requestPermissions(
-                    it, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
-            }
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
+
         }
     }
 
@@ -162,6 +160,7 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
             }
         }
         updateLocationUI()
+        getDeviceLocation()
     }
 
     private fun updateLocationUI() {

@@ -3,6 +3,7 @@ package com.tushar.map.ui.dashboard.profile
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import com.tushar.map.R
 import com.tushar.map.databinding.FragmentProfileBinding
 import com.tushar.map.ui.base.BaseFragment
 import com.tushar.map.ui.dashboard.viewmodel.DashboardViewModel
@@ -22,6 +23,11 @@ class ProfileFragment: BaseFragment<DashboardViewModel, FragmentProfileBinding>(
             })
             viewModel.emailId.observe(viewLifecycleOwner, Observer {emailId ->
                 tvUserEmail.text = emailId
+            })
+            viewModel.createdDateString.observe(viewLifecycleOwner, Observer {createdDate ->
+                createdDate?.let {
+                    tvOldDate.text = viewModel.createDate(createdDate).toString() +" "+ getString(R.string.days_old)
+                }
             })
             btLogout.setOnClickListener { viewModel.logout() }
         }

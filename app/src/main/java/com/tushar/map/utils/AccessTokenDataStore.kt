@@ -8,8 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.createDataStore
 import com.tushar.map.ui.dashboard.model.AccessToken
-import com.tushar.map.ui.dashboard.model.DisplayName
-import com.tushar.map.ui.dashboard.model.EmailId
+import com.tushar.map.ui.dashboard.model.IsUserLoggedIn
 import com.tushar.map.ui.dashboard.model.UserData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +22,8 @@ class AccessTokenDataStore @Inject constructor(@ApplicationContext context: Cont
         val USER_TOKEN = stringPreferencesKey("access_token")
         val DISPLAY_NAME = stringPreferencesKey("display_name")
         val EMAIL = stringPreferencesKey("email")
+        val CREATED_DATE = stringPreferencesKey("created_date")
+
     }
 
     private val dataStore: DataStore<Preferences> = context.createDataStore(name = "user")
@@ -33,23 +34,10 @@ class AccessTokenDataStore @Inject constructor(@ApplicationContext context: Cont
             AccessToken(token)
         }
 
-    val userLoggedInFlow: Flow<UserData> = dataStore.data
+    val userLoggedInFlow: Flow<IsUserLoggedIn> = dataStore.data
         .map { preferences ->
             val loggedIn = preferences[USER_LOGGED_IN] ?: false
-            UserData(loggedIn)
-    }
-
-
-    val displayNameFlow: Flow<DisplayName> = dataStore.data
-        .map { preferences ->
-            val displayName = preferences[DISPLAY_NAME] ?: ""
-            DisplayName(displayName)
-        }
-
-    val emailIdFlow: Flow<EmailId> = dataStore.data
-        .map { preferences ->
-            val emailId = preferences[EMAIL] ?: ""
-            EmailId(emailId)
+            IsUserLoggedIn(loggedIn)
     }
 
     suspend fun updateUserLoggedInStatus(loggedIn: Boolean) {
@@ -66,19 +54,20 @@ class AccessTokenDataStore @Inject constructor(@ApplicationContext context: Cont
         }
     }
 
-    suspend fun saveDisplayName(displayName: String?) {
-        dataStore.edit { preferences ->
-            displayName?.let {
-                preferences[DISPLAY_NAME] = it
-            }
-
+    val loginUserDataFlow: Flow<UserData> = dataStore.data
+        .map { preferences ->
+            val displayName = preferences[DISPLAY_NAME] ?: ""
+            val emailId = preferences[EMAIL] ?: ""
+            val createDate = preferences[CREATED_DATE] ?: ""
+            UserData(displayName, emailId, createDate)
         }
-    }
 
-    suspend fun saveEmail(email: String?) {
-        dataStore.edit { preferences ->
-            email?.let {
-                preferences[EMAIL] = it
+    suspend fun loginUserData(userData: UserData?) {
+        userData?.let {
+            dataStore.edit { preferences ->
+                preferences[DISPLAY_NAME] = userData.displayName!!
+                preferences[EMAIL] = userData.emailId!!
+                preferences[CREATED_DATE] = userData.createDate!!
             }
         }
     }
