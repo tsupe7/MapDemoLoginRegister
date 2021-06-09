@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.google.android.gms.common.api.ApiException
@@ -59,6 +58,7 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
     private var likelyPlaceAttributions: Array<List<*>?> = arrayOfNulls(0)
     private var likelyPlaceLatLngs: Array<LatLng?> = arrayOfNulls(0)
 
+    private var markers : ArrayList<Marker> = ArrayList()
 
     override fun setupView(view: View) {
 
@@ -116,6 +116,10 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
             }
         })
 
+        this.mMap.setOnMapClickListener {
+            removeMarkers()
+        }
+
         // Prompt the user for permission.
         getLocationPermission();
     }
@@ -131,7 +135,14 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
                     it,
                     Manifest.permission.ACCESS_FINE_LOCATION)
             }
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED  &&
+            activity?.let {
+                ContextCompat.checkSelfPermission(
+                    it,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             locationPermissionGranted = true
             // Turn on the My Location layer and the related control on the map.
             updateLocationUI();
@@ -139,7 +150,7 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
             // Get the current location of the device and set the position of the map.
             getDeviceLocation()
         } else {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
                 PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
 
         }
@@ -153,9 +164,16 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
             PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
 
                 // If request is cancelled, the result arrays are empty.
-                if (grantResults.isNotEmpty() &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationPermissionGranted = true
+
+                if(grantResults.isNotEmpty()) {
+                    for (grantResult in grantResults) {
+                        if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                            locationPermissionGranted = locationPermissionGranted && true
+                        }
+                        else{
+                            locationPermissionGranted = locationPermissionGranted && false
+                        }
+                    }
                 }
             }
         }
@@ -226,40 +244,45 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
                 LatLng(getString(R.string.pmc_building_lat).toDouble(),
                     getString(R.string.pmc_building_long).toDouble()), DEFAULT_ZOOM.toFloat()))
 
-        this.mMap?.addMarker(
+        markers.add(this.mMap?.addMarker(
             MarkerOptions()
                 .title(getString(R.string.pmc_building))
                 .position(LatLng(getString(R.string.pmc_building_lat).toDouble(), getString(R.string.pmc_building_long).toDouble()))
-                .icon(BitmapUtil.getBitmapDescriptor(requireActivity().applicationContext, R.drawable.ic_pmc_building)))
+                .icon(BitmapUtil.getBitmapDescriptor(requireActivity().applicationContext, R.drawable.ic_pmc_building))))
 
-        this.mMap?.addMarker(
+        markers.add(this.mMap?.addMarker(
             MarkerOptions()
                 .title(getString(R.string.bal_Gandharva))
                 .position(LatLng(getString(R.string.bal_Gandharva_lat).toDouble(), getString(R.string.bal_Gandharva_long).toDouble()))
                 .icon(BitmapUtil.getBitmapDescriptor(requireActivity().applicationContext, R.drawable.ic_theater))
-        )
+        ))
 
-        this.mMap?.addMarker(
+        markers.add(this.mMap?.addMarker(
             MarkerOptions()
                 .title(getString(R.string.sambhaji_garden))
                 .position(LatLng(getString(R.string.sambhaji_garden_lat).toDouble(), getString(R.string.sambhaji_garden_long).toDouble()))
                 .icon(BitmapUtil.getBitmapDescriptor(requireActivity().applicationContext, R.drawable.ic_sambhaji_garden))
-        )
+        ))
 
-        this.mMap?.addMarker(
+        markers.add(this.mMap?.addMarker(
             MarkerOptions()
                 .title(getString(R.string.junglee_maharaj_mandir))
                 .position(LatLng(getString(R.string.junglee_maharaj_mandir_lat).toDouble(), getString(R.string.junglee_maharaj_mandir_long).toDouble()))
                 .icon(BitmapUtil.getBitmapDescriptor(requireActivity().applicationContext, R.drawable.junglee_maharaj_mandir))
-        )
+        ))
 
-        this.mMap?.addMarker(
+        markers.add(this.mMap?.addMarker(
             MarkerOptions()
                 .title(getString(R.string.shaniwar_wada))
                 .position(LatLng(getString(R.string.shaniwar_wada_lat).toDouble(), getString(R.string.shaniwar_wada_long).toDouble()))
                 .icon(BitmapUtil.getBitmapDescriptor(requireActivity().applicationContext, R.drawable.ic_fort))
-        )
+        ))
+    }
 
+    private fun removeMarkers(){
+        for (marker in markers){
+            marker.remove()
+        }
     }
 
     @SuppressLint("MissingPermission")
