@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -31,8 +33,10 @@ import com.tushar.map.BuildConfig
 import com.tushar.map.R
 import com.tushar.map.databinding.FragmentMapBinding
 import com.tushar.map.ui.base.BaseFragment
+import com.tushar.map.ui.dashboard.response.VehiclesInfoResponse
 import com.tushar.map.ui.dashboard.viewmodel.DashboardViewModel
 import com.tushar.map.utils.BitmapUtil
+import com.tushar.map.utils.Status
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -81,8 +85,9 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
 
         //fragmentBinding.ivPlaces.setOnClickListener { showCurrentPlace() }
 
-        fragmentBinding.ivPlaces.setOnClickListener { showCustomerMakerPlace() }
+        //fragmentBinding.ivPlaces.setOnClickListener { showCustomerMakerPlace() }
 
+        fragmentBinding.ivPlaces.setOnClickListener { fetchVehicles() }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -117,7 +122,7 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
         })
 
         this.mMap.setOnMapClickListener {
-            removeMarkers()
+           // removeMarkers()
         }
 
         // Prompt the user for permission.
@@ -237,6 +242,48 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
         }
     }
 
+    private fun fetchVehicles(){
+        viewModel.vehicleListState.observe(viewLifecycleOwner, Observer { it ->
+            when (it.status) {
+                Status.SUCCESS -> showVehicles(it.data)
+                Status.ERROR -> showErrorText(it.message!!)
+                Status.NO_INTERNET -> showErrorText(getString(R.string.network_connection_error))
+            }
+        })
+
+        viewModel.fetchVehicles()
+    }
+
+    private fun showVehicles(vehicles : List<VehiclesInfoResponse>?){
+
+        if (vehicles != null) {
+
+            var vehicle = vehicles.get(0)
+            this.mMap?.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    vehicle.lat?.toDouble()?.let {
+                        vehicle.lng?.toDouble()?.let { it1 ->
+                            LatLng(
+                                it,
+                                it1
+                            )
+                        }
+                    }, DEFAULT_ZOOM.toFloat()))
+
+            for (vehicle in vehicles){
+                markers.add(this.mMap?.addMarker(
+                    MarkerOptions()
+                        .title(vehicle.licensePlateNumber)
+                        .position(vehicle.lat?.toDouble()?.let { vehicle.lng?.toDouble()?.let { it1 ->
+                            LatLng(it,
+                                it1
+                            )
+                        } })
+                        .icon(BitmapUtil.getBitmapDescriptor(requireActivity().applicationContext, R.drawable.ic_car))))
+            }
+        }
+    }
+
     private fun showCustomerMakerPlace() {
 
         this.mMap?.moveCamera(
@@ -275,7 +322,7 @@ class MapFragment : BaseFragment<DashboardViewModel, FragmentMapBinding>(), OnMa
             MarkerOptions()
                 .title(getString(R.string.shaniwar_wada))
                 .position(LatLng(getString(R.string.shaniwar_wada_lat).toDouble(), getString(R.string.shaniwar_wada_long).toDouble()))
-                .icon(BitmapUtil.getBitmapDescriptor(requireActivity().applicationContext, R.drawable.ic_fort))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_fort))
         ))
     }
 

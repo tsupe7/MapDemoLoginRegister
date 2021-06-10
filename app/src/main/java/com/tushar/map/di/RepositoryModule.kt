@@ -4,6 +4,8 @@ import com.tushar.login.repository.LoginRepository
 import com.tushar.login.repository.LoginRepositoryImpl
 import com.tushar.map.ui.dashboard.repository.UserRepository
 import com.tushar.map.ui.dashboard.repository.UserRepositoryImpl
+import com.tushar.map.ui.dashboard.repository.VehiclesRepository
+import com.tushar.map.ui.dashboard.repository.VehiclesRepositoryImpl
 import com.tushar.registration.repository.RegistrationRepository
 import com.tushar.registration.repository.RegistrationRepositoryImpl
 import dagger.Binds
@@ -24,4 +26,6 @@ interface RepositoryModule {
     @Binds
     fun provideUserRepository(userRepository: UserRepositoryImpl): UserRepository
 
+    @Binds
+    fun provideVehicleRepository(vehiclesRepositoryImpl: VehiclesRepositoryImpl): VehiclesRepository
 }

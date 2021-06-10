@@ -34,9 +34,9 @@ class LoginViewModel @Inject constructor(private val loginRepository: LoginRepos
             }
 
             try {
-
-                val userResponse = userRepository.getUser()
-                userInfo.postValue(Result.success(userResponse))
+                userRepository.getUser {user->
+                    userInfo.postValue(Result.success(user))
+                }
             }
             catch (e: Exception){
 

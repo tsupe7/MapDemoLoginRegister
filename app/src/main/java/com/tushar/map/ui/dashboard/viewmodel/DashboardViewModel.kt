@@ -4,6 +4,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.tushar.map.ui.base.BaseViewModel
 import com.tushar.map.ui.dashboard.repository.UserRepository
+import com.tushar.map.ui.dashboard.repository.VehiclesRepository
+import com.tushar.map.ui.dashboard.response.VehiclesInfoResponse
+import com.tushar.map.ui.login.model.response.LoginUserResponse
+import com.tushar.map.utils.Result
+import com.tushar.map.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -12,7 +17,12 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class DashboardViewModel @Inject constructor(private val repository: UserRepository) : BaseViewModel() {
+class DashboardViewModel @Inject constructor(private val repository: UserRepository,
+private val vehiclesRepository: VehiclesRepository) : BaseViewModel() {
+
+    private val _vehicleListState = SingleLiveEvent<Result<List<VehiclesInfoResponse>>>()
+    val vehicleListState: SingleLiveEvent<Result<List<VehiclesInfoResponse>>> = _vehicleListState
+
 
     var displayName = MutableLiveData<String>()
     var emailId = MutableLiveData<String>()
@@ -48,6 +58,19 @@ class DashboardViewModel @Inject constructor(private val repository: UserReposit
         viewModelScope.launch {
             repository.logout()
             _logOut.value = Unit
+        }
+    }
+
+    fun fetchVehicles(){
+        viewModelScope.launch {
+            vehicleListState.postValue(Result.loading(null))
+            try {
+                vehiclesRepository.getVehicles {vehicles->
+                    vehicleListState.postValue(Result.success(vehicles))
+                }
+            } catch (e: Exception) {
+                vehicleListState.postValue(Result.error(e.toString(), null))
+            }
         }
     }
 }

@@ -1,12 +1,15 @@
 package com.tushar.map.ui.dashboard.repository
 
-import com.tushar.map.ui.dashboard.model.*
+import com.tushar.map.ui.dashboard.model.AccessToken
+import com.tushar.map.ui.dashboard.model.IsUserLoggedIn
+import com.tushar.map.ui.dashboard.model.UserData
 import com.tushar.map.ui.dashboard.response.UserInfoResponse
 import kotlinx.coroutines.flow.Flow
 
 
 interface UserRepository {
-    suspend fun getUser(): UserInfoResponse
+
+    suspend fun getUser(onComplete: (UserInfoResponse) ->Unit)
     /**
      * Returns token
      */

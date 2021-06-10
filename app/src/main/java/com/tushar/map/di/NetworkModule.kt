@@ -3,6 +3,7 @@ package com.tushar.map.di
 import android.content.Context
 import com.tushar.map.BuildConfig
 import com.tushar.map.ui.dashboard.service.UserService
+import com.tushar.map.ui.dashboard.service.VehiclesService
 import com.tushar.map.ui.login.service.LoginService
 import com.tushar.map.ui.registration.service.RegistrationService
 import com.tushar.network.Networking
@@ -52,5 +53,9 @@ object NetworkModule {
     fun provideUserService(retrofit: Retrofit): UserService =
         retrofit.create(UserService::class.java)
 
+    @Provides
+    @Singleton
+    fun provideVehicleService(retrofit: Retrofit): VehiclesService =
+        retrofit.create(VehiclesService::class.java)
 
 }

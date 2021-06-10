@@ -30,8 +30,9 @@ class SignUpViewModel @Inject constructor(
                 val response = repository.registerUser(request)
                 registerUserState.postValue(Result.success(response))
 
-                val userResponse = userRepository.getUser()
-                userInfo.postValue(Result.success(userResponse))
+                userRepository.getUser {user->
+                    userInfo.postValue(Result.success(user))
+                }
             } catch (e: Exception) {
                 registerUserState.postValue(Result.error(e.toString(), null))
             }
