@@ -30,7 +30,7 @@ android {
         release {
             minifyEnabled true // to apply the proguard
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "BASE_URL", "\"https://api.projects.bootcamp.mindorks.com/batch/green/\"")
+            buildConfigField("String", "BASE_URL", "\"https://blooming-stream-45371.herokuapp.com/\"")
         }
     }
 
